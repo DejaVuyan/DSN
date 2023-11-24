@@ -90,7 +90,8 @@ parser.add_argument('--hidden_dim', default=512, type=int,
 args = parser.parse_args()
 
 USE_CUDA = torch.cuda.is_available()
-device = torch.device("cuda:0" if USE_CUDA else "cpu")
+# device = torch.device("cuda:0" if USE_CUDA else "cpu")
+device = torch.device("cuda:0")
 
 if not os.path.exists(args.save_dir):
     os.makedirs(args.save_dir)
@@ -112,7 +113,7 @@ with torch.no_grad():
 network.train()
 
 network.to(device)
-network = nn.DataParallel(network, device_ids=[0,1])
+network = nn.DataParallel(network, device_ids=[0])
 content_tf = train_transform()
 style_tf = train_transform()
 

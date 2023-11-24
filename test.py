@@ -88,7 +88,8 @@ alpha=args.a
 
 
 
-device = torch.device("cuda:2" if torch.cuda.is_available() else "cpu")
+# device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+device = torch.device("cpu")
 
 # Either --content or --content_dir should be given.
 if args.content:
@@ -156,28 +157,30 @@ style_tf = test_transform(style_size, crop)
 for content_path in content_paths:
     for style_path in style_paths:
         print(content_path)
-       
-      
-        content_tf1 = content_transform()       
+
+
+        content_tf1 = content_transform()
         content = content_tf(Image.open(content_path).convert("RGB"))
 
-        h,w,c=np.shape(content)    
+        h,w,c=np.shape(content)
         style_tf1 = style_transform(h,w)
         style = style_tf(Image.open(style_path).convert("RGB"))
 
-      
+
         style = style.to(device).unsqueeze(0)
         content = content.to(device).unsqueeze(0)
-        
-        with torch.no_grad():
-            output= network(content,style)       
+
+        # with torch.no_grad():
+        # output= network(content,style)
+        output, loss_c, loss_s, loss_lambda1, loss_lambda2 = network(content,style)
         output = output.cpu()
-                
+        print(output)
+
         output_name = '{:s}/{:s}_stylized_{:s}{:s}'.format(
             output_path, splitext(basename(content_path))[0],
             splitext(basename(style_path))[0], save_ext
         )
- 
+
         save_image(output, output_name)
    
 

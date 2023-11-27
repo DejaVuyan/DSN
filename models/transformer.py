@@ -7,8 +7,47 @@ from torch import nn, Tensor
 from function import normal,normal_style
 import numpy as np
 import os
+import math
+
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 os.environ["CUDA_VISIBLE_DEVICES"] = "0, 1"
+
+def fft_2D(input_Tensor,mask_ratio = 0.25):
+    """
+    转换到频域，然后使用低通滤波器滤波，将高频部分保留，去除低频部分
+    滤波器的形状为以原图中心为中心的，面积为mask_ratio*input_tensor的一个矩形，矩形中的是0，其他部分不变
+    假设input_tensor是个灰度图像，输入是(H,W),需要为Numpy的array模式
+    """
+    #print(input_Tensor.shape)
+    # img = input_Tensor.squeeze(dim=0)  # (H,W)
+    img = input_Tensor
+    # 创建一个低通滤波器
+    mask = np.ones(img.shape)
+    crow = int((img.shape[0]) / 2)  # 中心位置
+    ccol = int((img.shape[1]) / 2)  # 中心位置
+    mask_l = int(math.sqrt(img.shape[0] * img.shape[1] * mask_ratio) / 2)
+    mask[crow - mask_l:crow + mask_l, ccol - mask_l:ccol + mask_l] = 0
+
+    f = np.fft.fft2(img)  # 2D傅里叶变换
+    fshift = np.fft.fftshift(f)  # 低频中心化
+    # 滤波
+    fshift = fshift * mask
+
+    # 傅里叶逆变换
+    ishift = np.fft.ifftshift(fshift)  # 逆中心化
+    iimg = np.fft.ifft2(ishift)  # 傅里叶逆变换
+    iimg = np.abs(iimg)  # 去掉虚部 此时数据为float64的ndarray
+    # iimg = np.expand_dims(iimg, axis=-1)  # 回到了原来的函数
+    #print(iimg.shape)
+    # 变成Tensor
+    # to_tensor = ToTensor()
+    # iimg_Tensor = to_tensor(iimg).float()  # 从double float64转换为float 32
+    # # 归一化
+    # nor = Normalize((0.5,), (0.5,))
+    # iimg_Tensor = nor(iimg_Tensor)
+
+    return iimg
+
 class Transformer(nn.Module):
 
     def __init__(self, d_model=512, nhead=8, num_encoder_layers=3,
@@ -45,11 +84,30 @@ class Transformer(nn.Module):
     def forward(self, style, mask , content, pos_embed_c, pos_embed_s):
 
         # content-aware positional embedding
-        content_pool = self.averagepooling(content)       
-        pos_c = self.new_ps(content_pool)
-        pos_embed_c = F.interpolate(pos_c, mode='bilinear',size= style.shape[-2:])
+        #content_pool = self.averagepooling(content)
+        # pos_c = self.new_ps(content_pool)
+        # pos_embed_c = F.interpolate(pos_c, mode='bilinear',size= style.shape[-2:])
+        # print("content size is ", content.size())
+        # print("pos_c size is ", pos_c.size())
+        # print("pos_embed_c size is ", pos_embed_c.size())
 
-        ###flatten NxCxHxW to HWxNxC     
+        # frequency-aware style coding
+        # print("style size is ", style.size())
+        style_freq = np.zeros(style.size())
+
+        for c in range(style.shape[0]):
+            for d in range(style.shape[1]):
+                style_freq[c][d] = fft_2D(style[c][d].detach().cpu().numpy(),0.25)
+                # print("styte", style[c][d])
+                # print("styte_freq", style_freq[c][d])
+                #print("aa", style[c][d].size())
+
+        pos_embed_s = torch.from_numpy(style_freq).cuda().float()
+        # print("style_freq", style_freq)
+        # print("pos_embed_s",pos_embed_s.dtype)
+        # print("pos_embed_c",pos_embed_c.dtype)
+
+        ###flatten NxCxHxW to HWxNxC
         style = style.flatten(2).permute(2, 0, 1)
         if pos_embed_s is not None:
             pos_embed_s = pos_embed_s.flatten(2).permute(2, 0, 1)

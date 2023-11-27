@@ -64,21 +64,21 @@ def warmup_learning_rate(optimizer, iteration_count):
 
 parser = argparse.ArgumentParser()
 # Basic options
-parser.add_argument('--content_dir', default='./datasets/train2014', type=str,   
+parser.add_argument('--content_dir', default='/data/yuzun/SR/data/SE_0921_ori/HR/all', type=str,
                     help='Directory path to a batch of content images')
-parser.add_argument('--style_dir', default='./datasets/Images', type=str,  #wikiart dataset crawled from https://www.wikiart.org/
+parser.add_argument('--style_dir', default='/data/yuzun/SR/data/SE_0921_ori/MR/all', type=str,  #wikiart dataset crawled from https://www.wikiart.org/
                     help='Directory path to a batch of style images')
 parser.add_argument('--vgg', type=str, default='./experiments/vgg_normalised.pth')  #run the train.py, please download the pretrained vgg checkpoint
 
 # training options
-parser.add_argument('--save_dir', default='./experiments',
+parser.add_argument('--save_dir', default='/data/yuzun/Stytr_experience/test',
                     help='Directory to save the model')
 parser.add_argument('--log_dir', default='./logs',
                     help='Directory to save the log')
 parser.add_argument('--lr', type=float, default=5e-4)
 parser.add_argument('--lr_decay', type=float, default=1e-5)
 parser.add_argument('--max_iter', type=int, default=160000)
-parser.add_argument('--batch_size', type=int, default=8)
+parser.add_argument('--batch_size', type=int, default=1)
 parser.add_argument('--style_weight', type=float, default=10.0)
 parser.add_argument('--content_weight', type=float, default=7.0)
 parser.add_argument('--n_threads', type=int, default=16)

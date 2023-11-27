@@ -29,7 +29,7 @@ def test_transform(size, crop):
 def style_transform(h,w):
     k = (h,w)
     size = int(np.max(k))
-    print(type(size))
+    #print(type(size))
     transform_list = []    
     transform_list.append(transforms.CenterCrop((h,w)))
     transform_list.append(transforms.ToTensor())

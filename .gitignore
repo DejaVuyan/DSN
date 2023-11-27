@@ -2,3 +2,4 @@ logs/
 # 任何文件夹下的pycache都不记录到git
 **/__pycache__
 experiments/
+.idea/

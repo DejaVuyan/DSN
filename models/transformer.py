@@ -93,16 +93,16 @@ class Transformer(nn.Module):
 
         # frequency-aware style coding
         # print("style size is ", style.size())
-        style_freq = np.zeros(style.size())
+       # style_freq = np.zeros(style.size())
 
-        for c in range(style.shape[0]):
-            for d in range(style.shape[1]):
-                style_freq[c][d] = fft_2D(style[c][d].detach().cpu().numpy(),0.25)
-                # print("styte", style[c][d])
-                # print("styte_freq", style_freq[c][d])
-                #print("aa", style[c][d].size())
+       # for c in range(style.shape[0]):
+       #     for d in range(style.shape[1]):
+       #         style_freq[c][d] = fft_2D(style[c][d].detach().cpu().numpy(),0.25)
+       #         # print("styte", style[c][d])
+       #         # print("styte_freq", style_freq[c][d])
+       #         #print("aa", style[c][d].size())
 
-        pos_embed_s = torch.from_numpy(style_freq).cuda().float()
+       # pos_embed_s = torch.from_numpy(style_freq).cuda().float()
         # print("style_freq", style_freq)
         # print("pos_embed_s",pos_embed_s.dtype)
         # print("pos_embed_c",pos_embed_c.dtype)

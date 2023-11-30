@@ -176,6 +176,15 @@ class StyTrans(nn.Module):
         target_mean, target_std = calc_mean_std(target)
         return self.mse_loss(input_mean, target_mean) + \
                self.mse_loss(input_std, target_std)
+
+    def calc_freq_loss(self, input, target):
+        assert (input.size() == target.size())
+        assert (target.requires_grad is False)
+        input_freq = torch.fft.fft2(input) # norm?
+        target_freq = torch.fft.fft2(target)
+        return self.mes_loss(input_freq, target_freq)
+
+
     def forward(self, samples_c: NestedTensor,samples_s: NestedTensor):
         """ The forward expects a NestedTensor, which consists of:
                - samples.tensor: batched images, of shape [batch_size x 3 x H x W]
@@ -202,19 +211,20 @@ class StyTrans(nn.Module):
         pos_c = None
 
         mask = None
-        hs = self.transformer(style, mask , content, pos_c, pos_s)   
+        hs = self.transformer(style, mask , content, pos_c, pos_s)   # content和style输入网络，得到真正的输出Ics
         Ics = self.decode(hs)
 
-        Ics_feats = self.encode_with_intermediate(Ics)
+        Ics_feats = self.encode_with_intermediate(Ics) # 输出经过VGG网络提取特征后的feature
         loss_c = self.calc_content_loss(normal(Ics_feats[-1]), normal(content_feats[-1]))+self.calc_content_loss(normal(Ics_feats[-2]), normal(content_feats[-2]))
         # Style loss
         loss_s = self.calc_style_loss(Ics_feats[0], style_feats[0])
         for i in range(1, 5):
-            loss_s += self.calc_style_loss(Ics_feats[i], style_feats[i])
-            
+            loss_s += self.calc_style_loss(Ics_feats[i], style_feats[i]) # 对vgg的不同层取一个差值
+
+        loss_freq = self.calc_freq_loss(Ics,samples_s.tensors) # 计算freq_loss
         
-        Icc = self.decode(self.transformer(content, mask , content, pos_c, pos_c))
-        Iss = self.decode(self.transformer(style, mask , style, pos_s, pos_s))    
+        Icc = self.decode(self.transformer(content, mask , content, pos_c, pos_c)) # 将content和conent一起输入transformer网络中，只是为了计算loss
+        Iss = self.decode(self.transformer(style, mask , style, pos_s, pos_s))  # 将style和style一起输入transformer网络中，只是为了计算loss
 
         #Identity losses lambda 1    
         loss_lambda1 = self.calc_content_loss(Icc,content_input)+self.calc_content_loss(Iss,style_input)
@@ -226,5 +236,5 @@ class StyTrans(nn.Module):
         for i in range(1, 5):
             loss_lambda2 += self.calc_content_loss(Icc_feats[i], content_feats[i])+self.calc_content_loss(Iss_feats[i], style_feats[i])
         # Please select and comment out one of the following two sentences
-        return Ics,  loss_c, loss_s, loss_lambda1, loss_lambda2   #train
+        return Ics,  loss_c, loss_s, loss_lambda1, loss_lambda2, loss_freq   #train
         # return Ics    #test 

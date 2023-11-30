@@ -45,4 +45,7 @@
 #CUDA_VISIBLE_DEVICES=0 python train.py --style_dir /data/yuzun/SR/data/SE_0921_ori/MR/all --content_dir /data/yuzun/SR/data/SE_0921_ori/HR/all --save_dir /data/yuzun/Stytr_experience/017_SEall_ori_1 --batch_size 2  --hidden_dim 512 --max_iter 300000 --save_model_interval 5000
 
 #2023-11-27 增加了频率编码,去掉了CAPE
-CUDA_VISIBLE_DEVICES=0 python train.py --style_dir /data/yuzun/SR/data/SE_0921_ori/MR/all --content_dir /data/yuzun/SR/data/SE_0921_ori/HR/all --save_dir /data/yuzun/SR/results/frequence1 --batch_size 3  --hidden_dim 512 --max_iter 300000 --save_model_interval 5000
+#CUDA_VISIBLE_DEVICES=0 python train.py --style_dir /data/yuzun/SR/data/SE_0921_ori/MR/all --content_dir /data/yuzun/SR/data/SE_0921_ori/HR/all --save_dir /data/yuzun/SR/results/frequence1 --batch_size 3  --hidden_dim 512 --max_iter 300000 --save_model_interval 5000
+
+#2023-12-6 freq_loss 第一次实验
+CUDA_VISIBLE_DEVICES=1 python train.py --style_dir /data/yuzun/SR/data/SE_0921_ori/MR/all --content_dir /data/yuzun/SR/data/SE_0921_ori/HR/all --save_dir /data/yuzun/SR/experience/freq_loss1 --batch_size 4  --hidden_dim 512 --max_iter 300000 --save_model_interval 5000

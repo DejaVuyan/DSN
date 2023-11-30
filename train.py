@@ -80,6 +80,7 @@ parser.add_argument('--lr_decay', type=float, default=1e-5)
 parser.add_argument('--max_iter', type=int, default=160000)
 parser.add_argument('--batch_size', type=int, default=1)
 parser.add_argument('--style_weight', type=float, default=10.0)
+parser.add_argument('--freq_weight', type=float, default=5.0)
 parser.add_argument('--content_weight', type=float, default=7.0)
 parser.add_argument('--n_threads', type=int, default=16)
 parser.add_argument('--save_model_interval', type=int, default=10000)
@@ -154,7 +155,7 @@ for i in tqdm(range(args.max_iter)):
     # print('learning_rate: %s' % str(optimizer.param_groups[0]['lr']))
     content_images = next(content_iter).to(device)
     style_images = next(style_iter).to(device)  
-    out, loss_c, loss_s,l_identity1, l_identity2 = network(content_images, style_images)
+    out, loss_c, loss_s,l_identity1, l_identity2, loss_freq = network(content_images, style_images)
 
     if i % 100 == 0:
         output_name = '{:s}/test/{:s}{:s}'.format(
@@ -167,9 +168,11 @@ for i in tqdm(range(args.max_iter)):
         
     loss_c = args.content_weight * loss_c
     loss_s = args.style_weight * loss_s
-    loss = loss_c + loss_s + (l_identity1 * 70) + (l_identity2 * 1) 
+    loss_freq = args.freq_weight * loss_freq
+    loss = loss_c + loss_s + loss_freq + (l_identity1 * 70) + (l_identity2 * 1)
   
-    print(loss.sum().cpu().detach().numpy(),"-content:",loss_c.sum().cpu().detach().numpy(),"-style:",loss_s.sum().cpu().detach().numpy()
+    print(loss.sum().cpu().detach().numpy(),"-content:",loss_c.sum().cpu().detach().numpy(),"-style:",loss_s.sum().cpu().detach().numpy(),
+          "-freq:",loss_freq.sum().cpu().detach().numpy()
               ,"-l1:",l_identity1.sum().cpu().detach().numpy(),"-l2:",l_identity2.sum().cpu().detach().numpy()
               )
        
@@ -179,6 +182,7 @@ for i in tqdm(range(args.max_iter)):
 
     writer.add_scalar('loss_content', loss_c.sum().item(), i + 1)
     writer.add_scalar('loss_style', loss_s.sum().item(), i + 1)
+    writer.add_scalar('loss_freq', loss_freq.sum().item(), i + 1)
     writer.add_scalar('loss_identity1', l_identity1.sum().item(), i + 1)
     writer.add_scalar('loss_identity2', l_identity2.sum().item(), i + 1)
     writer.add_scalar('total_loss', loss.sum().item(), i + 1)

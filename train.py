@@ -182,10 +182,10 @@ for i in tqdm(range(args.max_iter)):
 
     writer.add_scalar('loss_content', loss_c.sum().item(), i + 1)
     writer.add_scalar('loss_style', loss_s.sum().item(), i + 1)
-    writer.add_scalar('loss_freq', loss_freq.sum().item(), i + 1)
+    writer.add_scalar('loss_freq', loss_freq.real.sum().item(), i + 1)
     writer.add_scalar('loss_identity1', l_identity1.sum().item(), i + 1)
     writer.add_scalar('loss_identity2', l_identity2.sum().item(), i + 1)
-    writer.add_scalar('total_loss', loss.sum().item(), i + 1)
+    writer.add_scalar('total_loss', loss.real.sum().item(), i + 1)
 
     if (i + 1) % args.save_model_interval == 0 or (i + 1) == args.max_iter:
         state_dict = network.module.transformer.state_dict()

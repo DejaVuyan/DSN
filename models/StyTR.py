@@ -177,12 +177,15 @@ class StyTrans(nn.Module):
         return self.mse_loss(input_mean, target_mean) + \
                self.mse_loss(input_std, target_std)
 
+    def complex_mse_loss(self, input, target):
+        return ((input - target) ** 2).mean(dtype=torch.complex64)
+
     def calc_freq_loss(self, input, target):
         assert (input.size() == target.size())
         assert (target.requires_grad is False)
         input_freq = torch.fft.fft2(input) # norm?
         target_freq = torch.fft.fft2(target)
-        return self.mes_loss(input_freq, target_freq)
+        return self.complex_mse_loss(input_freq, target_freq)
 
 
     def forward(self, samples_c: NestedTensor,samples_s: NestedTensor):

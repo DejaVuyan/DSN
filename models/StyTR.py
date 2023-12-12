@@ -177,15 +177,35 @@ class StyTrans(nn.Module):
         return self.mse_loss(input_mean, target_mean) + \
                self.mse_loss(input_std, target_std)
 
-    def complex_mse_loss(self, input, target):
-        return ((input - target) ** 2).mean(dtype=torch.complex64)
+    # def complex_mse_loss(self, input, target):
+    #     return ((input - target) ** 2).mean(dtype=torch.complex64)
 
     def calc_freq_loss(self, input, target):
         assert (input.size() == target.size())
         assert (target.requires_grad is False)
-        input_freq = torch.fft.fft2(input) # norm?
-        target_freq = torch.fft.fft2(target)
-        return self.complex_mse_loss(input_freq, target_freq)
+        # fft2D
+        input_freq = torch.fft.fft2(input, norm='ortho')
+        target_freq = torch.fft.fft2(target, norm='ortho')
+        # split real and image
+        input_freq_vec = torch.stack([input_freq.real, input_freq.imag], -1)
+        input_freq_vec = torch.mean(input_freq_vec, 0, keepdim=True)
+        target_freq_vec = torch.stack([target_freq.real, target_freq.imag], -1)
+        target_freq_vec = torch.mean(target_freq_vec, 0, keepdim=True)
+
+        # cal freq distance
+        tmp = (input_freq_vec - target_freq_vec) ** 2
+        freq_distance = tmp[..., 0] + tmp[..., 1]
+
+        # print(freq_distance)
+        # print(torch.mean(freq_distance))
+
+        # print(input.shape)
+        # print(input_freq_vec.shape)
+        # # print(input_freq)
+        # print(input_freq_vec)
+        # print(input_freq_vec[..., 0])
+        # print(input_freq_vec[..., 1])
+        return torch.mean(freq_distance)
 
 
     def forward(self, samples_c: NestedTensor,samples_s: NestedTensor):
@@ -197,18 +217,18 @@ class StyTrans(nn.Module):
         content_input = samples_c
         style_input = samples_s
         if isinstance(samples_c, (list, torch.Tensor)):
-            samples_c = nested_tensor_from_tensor_list(samples_c)   # support different-sized images padding is used for mask [tensor, mask] 
+            samples_c = nested_tensor_from_tensor_list(samples_c)   # support different-sized images padding is used for mask [tensor, mask]
         if isinstance(samples_s, (list, torch.Tensor)):
-            samples_s = nested_tensor_from_tensor_list(samples_s) 
-        
-        # ### features used to calcate loss 
+            samples_s = nested_tensor_from_tensor_list(samples_s)
+
+        # ### features used to calcate loss
         content_feats = self.encode_with_intermediate(samples_c.tensors)
         style_feats = self.encode_with_intermediate(samples_s.tensors)
 
         ### Linear projection
         style = self.embedding(samples_s.tensors)
         content = self.embedding(samples_c.tensors)
-        
+
         # postional embedding is calculated in transformer.py
         pos_s = None
         pos_c = None
@@ -225,13 +245,13 @@ class StyTrans(nn.Module):
             loss_s += self.calc_style_loss(Ics_feats[i], style_feats[i]) # 对vgg的不同层取一个差值
 
         loss_freq = self.calc_freq_loss(Ics,samples_s.tensors) # 计算freq_loss
-        
+
         Icc = self.decode(self.transformer(content, mask , content, pos_c, pos_c)) # 将content和conent一起输入transformer网络中，只是为了计算loss
         Iss = self.decode(self.transformer(style, mask , style, pos_s, pos_s))  # 将style和style一起输入transformer网络中，只是为了计算loss
 
-        #Identity losses lambda 1    
+        #Identity losses lambda 1
         loss_lambda1 = self.calc_content_loss(Icc,content_input)+self.calc_content_loss(Iss,style_input)
-        
+
         #Identity losses lambda 2
         Icc_feats=self.encode_with_intermediate(Icc)
         Iss_feats=self.encode_with_intermediate(Iss)
@@ -240,4 +260,5 @@ class StyTrans(nn.Module):
             loss_lambda2 += self.calc_content_loss(Icc_feats[i], content_feats[i])+self.calc_content_loss(Iss_feats[i], style_feats[i])
         # Please select and comment out one of the following two sentences
         return Ics,  loss_c, loss_s, loss_lambda1, loss_lambda2, loss_freq   #train
-        # return Ics    #test 
+        # return Ics    #test
+

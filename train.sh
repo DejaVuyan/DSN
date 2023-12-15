@@ -51,4 +51,13 @@
 #CUDA_VISIBLE_DEVICES=1 python train.py --style_dir /data/yuzun/SR/data/SE_0921_ori/MR/all --content_dir /data/yuzun/SR/data/SE_0921_ori/HR/all --save_dir /data/yuzun/SR/experience/freq_loss1 --batch_size 4  --hidden_dim 512 --max_iter 300000 --save_model_interval 5000
 
 #2023-12-13 freq_loss 第二次实验 6003
-CUDA_VISIBLE_DEVICES=0 python train.py --style_dir /data/yuzun/SR/data/SE_0921_ori/MR/all --content_dir /data/yuzun/SR/data/SE_0921_ori/HR/all --save_dir /data/yuzun/SR/experience/freq_loss2 --batch_size 4  --hidden_dim 512 --max_iter 300000 --save_model_interval 5000 --freq_weight 100
+#CUDA_VISIBLE_DEVICES=0 python train.py --style_dir /data/yuzun/SR/data/SE_0921_ori/MR/all --content_dir /data/yuzun/SR/data/SE_0921_ori/HR/all --save_dir /data/yuzun/SR/experience/freq_loss2 --batch_size 4  --hidden_dim 512 --max_iter 300000 --save_model_interval 5000 --freq_weight 100
+
+# 2023-12-15 focal_freq_loss实验 6003 并将数据集改成train
+#CUDA_VISIBLE_DEVICES=0 python train.py --style_dir /data/yuzun/SR/data/SE_0921_ori/MR/train --content_dir /data/yuzun/SR/data/SE_0921_ori/HR/train --save_dir /data/yuzun/SR/experience/focal_freq_loss1 --batch_size 4  --hidden_dim 512 --max_iter 300000 --save_model_interval 5000 --freq_weight 100
+
+#2023-12-15 freq_loss 在train上训练 7425
+#CUDA_VISIBLE_DEVICES=1 python train.py --style_dir /data/yuzun/SR/data/SE_0921_ori/MR/train --content_dir /data/yuzun/SR/data/SE_0921_ori/HR/train --save_dir /data/yuzun/SR/experience/freq_loss3 --batch_size 4  --hidden_dim 512 --max_iter 300000 --save_model_interval 5000 --freq_weight 100
+
+# 2023-12-17 在train上重新训练benchmark 6003
+CUDA_VISIBLE_DEVICES=0 python train.py --style_dir /data/yuzun/SR/data/SE_0921_ori/MR/train --content_dir /data/yuzun/SR/data/SE_0921_ori/HR/train --save_dir /data/yuzun/SR/experience/benchmark_train --batch_size 4  --hidden_dim 512 --max_iter 300000 --save_model_interval 5000

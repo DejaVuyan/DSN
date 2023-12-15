@@ -10,6 +10,7 @@ from function import normal,normal_style
 from function import calc_mean_std
 import scipy.stats as stats
 from models.ViT_helper import DropPath, to_2tuple, trunc_normal_
+from focal_frequency_loss import FocalFrequencyLoss as FFL
 
 class PatchEmbed(nn.Module):
     """ Image to Patch Embedding
@@ -196,17 +197,11 @@ class StyTrans(nn.Module):
         tmp = (input_freq_vec - target_freq_vec) ** 2
         freq_distance = tmp[..., 0] + tmp[..., 1]
 
-        # print(freq_distance)
-        # print(torch.mean(freq_distance))
-
-        # print(input.shape)
-        # print(input_freq_vec.shape)
-        # # print(input_freq)
-        # print(input_freq_vec)
-        # print(input_freq_vec[..., 0])
-        # print(input_freq_vec[..., 1])
         return torch.mean(freq_distance)
 
+    def calc_focal_freq_loss(self,input, target):
+        ffl = FFL(loss_weight=1.0, alpha=1.0)  # initialize nn.Module class
+        return ffl(input, target)
 
     def forward(self, samples_c: NestedTensor,samples_s: NestedTensor):
         """ The forward expects a NestedTensor, which consists of:
@@ -244,7 +239,8 @@ class StyTrans(nn.Module):
         for i in range(1, 5):
             loss_s += self.calc_style_loss(Ics_feats[i], style_feats[i]) # 对vgg的不同层取一个差值
 
-        loss_freq = self.calc_freq_loss(Ics,samples_s.tensors) # 计算freq_loss
+        #loss_freq = self.calc_freq_loss(Ics,samples_s.tensors) # 计算freq_loss
+        loss_freq = self.calc_focal_freq_loss(Ics,samples_s.tensors) # 计算freq_loss
 
         Icc = self.decode(self.transformer(content, mask , content, pos_c, pos_c)) # 将content和conent一起输入transformer网络中，只是为了计算loss
         Iss = self.decode(self.transformer(style, mask , style, pos_s, pos_s))  # 将style和style一起输入transformer网络中，只是为了计算loss

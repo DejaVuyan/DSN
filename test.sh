@@ -43,4 +43,13 @@
 #CUDA_VISIBLE_DEVICES=0  python test.py --style_dir Image_3 --content_dir /data/yuzun/SE_0919/SE_0921_ori/HR/test --output /data/yuzun/Stytr_014_SEall_2_out_Image_4 --decoder_path /data/yuzun/Stytr_experience/016_SEall_ori/decoder_iter_300000.pth --Trans_path /data/yuzun/Stytr_experience/016_SEall_ori/transformer_iter_300000.pth --embedding_path /data/yuzun/Stytr_experience/016_SEall_ori/embedding_iter_300000.pth --hidden_dim 512
 
 # 11-2 将size改成512
-CUDA_VISIBLE_DEVICES=0  python test.py --style_dir Image_3 --content_dir /data/yuzun/SE_0919/SE_0921_ori/HR/test --output /data/yuzun/Stytr_014_SEall_2_out_Image_5 --decoder_path /data/yuzun/Stytr_experience/016_SEall_ori/decoder_iter_300000.pth --Trans_path /data/yuzun/Stytr_experience/016_SEall_ori/transformer_iter_300000.pth --embedding_path /data/yuzun/Stytr_experience/016_SEall_ori/embedding_iter_300000.pth --hidden_dim 512
+#CUDA_VISIBLE_DEVICES=0  python test.py --style_dir Image_3 --content_dir /data/yuzun/SE_0919/SE_0921_ori/HR/test --output /data/yuzun/Stytr_014_SEall_2_out_Image_5 --decoder_path /data/yuzun/Stytr_experience/016_SEall_ori/decoder_iter_300000.pth --Trans_path /data/yuzun/Stytr_experience/016_SEall_ori/transformer_iter_300000.pth --embedding_path /data/yuzun/Stytr_experience/016_SEall_ori/embedding_iter_300000.pth --hidden_dim 512
+
+# 11-29 针对benchmark的test
+#CUDA_VISIBLE_DEVICES=0  python test.py --style /data/yuzun/SR/data/SE_0921_ori/MR/test/SE_0921_3_109m.png --content_dir /data/yuzun/SR/data/SE_0921_ori/HR/test --output /data/yuzun/SR/results/benchmark --decoder_path /data/yuzun/SR/experience/benchmark/decoder_iter_300000.pth --Trans_path /data/yuzun/SR/experience/benchmark/transformer_iter_300000.pth --embedding_path /data/yuzun/SR/experience/benchmark/embedding_iter_300000.pth --hidden_dim 512
+
+# 12-18 test freq_loss3 7425 在train上训练的
+#CUDA_VISIBLE_DEVICES=1  python test.py --style /data/yuzun/SR/data/SE_0921_ori/MR/test/SE_0921_3_111m.png --content_dir /data/yuzun/SR/data/SE_0921_ori/HR/test --output /data/yuzun/SR/results/freq_loss3 --decoder_path /data/yuzun/SR/experience/freq_loss3/decoder_iter_300000.pth --Trans_path /data/yuzun/SR/experience/freq_loss3/transformer_iter_300000.pth --embedding_path /data/yuzun/SR/experience/freq_loss3/embedding_iter_300000.pth --hidden_dim 512
+
+# 12-20 test benchmark 6003 在train上训练的
+CUDA_VISIBLE_DEVICES=1  python test.py --style /data/yuzun/SR/data/SE_0921_ori/MR/test/SE_0921_3_111m.png --content_dir /data/yuzun/SR/data/SE_0921_ori/HR/test --output /data/yuzun/SR/results/benchmark_train --decoder_path /data/yuzun/SR/experience/benchmark_train/decoder_iter_300000.pth --Trans_path /data/yuzun/SR/experience/benchmark_train/transformer_iter_300000.pth --embedding_path /data/yuzun/SR/experience/benchmark_train/embedding_iter_300000.pth --hidden_dim 512

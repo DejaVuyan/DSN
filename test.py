@@ -170,16 +170,18 @@ for content_path in content_paths:
         style = style.to(device).unsqueeze(0)
         content = content.to(device).unsqueeze(0)
 
-        # with torch.no_grad():
-        # output= network(content,style)
-        output, loss_c, loss_s, loss_lambda1, loss_lambda2 = network(content,style)
-        output = output.cpu()
-        #print(output)
+        # test的时候开启
+        with torch.no_grad():
+            output= network(content,style)
+        #output, loss_c, loss_s, loss_lambda1, loss_lambda2 = network(content,style)
+            output = output.cpu()
 
         output_name = '{:s}/{:s}_stylized_{:s}{:s}'.format(
             output_path, splitext(basename(content_path))[0],
             splitext(basename(style_path))[0], save_ext
         )
+
+        print(output_name)
 
         save_image(output, output_name)
    

@@ -52,4 +52,13 @@
 #CUDA_VISIBLE_DEVICES=1  python test.py --style /data/yuzun/SR/data/SE_0921_ori/MR/test/SE_0921_3_111m.png --content_dir /data/yuzun/SR/data/SE_0921_ori/HR/test --output /data/yuzun/SR/results/freq_loss3 --decoder_path /data/yuzun/SR/experience/freq_loss3/decoder_iter_300000.pth --Trans_path /data/yuzun/SR/experience/freq_loss3/transformer_iter_300000.pth --embedding_path /data/yuzun/SR/experience/freq_loss3/embedding_iter_300000.pth --hidden_dim 512
 
 # 12-20 test benchmark 6003 在train上训练的
-CUDA_VISIBLE_DEVICES=1  python test.py --style /data/yuzun/SR/data/SE_0921_ori/MR/test/SE_0921_3_111m.png --content_dir /data/yuzun/SR/data/SE_0921_ori/HR/test --output /data/yuzun/SR/results/benchmark_train --decoder_path /data/yuzun/SR/experience/benchmark_train/decoder_iter_300000.pth --Trans_path /data/yuzun/SR/experience/benchmark_train/transformer_iter_300000.pth --embedding_path /data/yuzun/SR/experience/benchmark_train/embedding_iter_300000.pth --hidden_dim 512
+#CUDA_VISIBLE_DEVICES=1  python test.py --style /data/yuzun/SR/data/SE_0921_ori/MR/test/SE_0921_3_111m.png --content_dir /data/yuzun/SR/data/SE_0921_ori/HR/test --output /data/yuzun/SR/results/benchmark_train --decoder_path /data/yuzun/SR/experience/benchmark_train/decoder_iter_300000.pth --Trans_path /data/yuzun/SR/experience/benchmark_train/transformer_iter_300000.pth --embedding_path /data/yuzun/SR/experience/benchmark_train/embedding_iter_300000.pth --hidden_dim 512
+
+# 24-1-22 test focal_freq loss 6003 在train上训练的
+#CUDA_VISIBLE_DEVICES=1  python test.py --style /data/yuzun/SR/data/SE_0921_ori/MR/test/SE_0921_3_111m.png --content_dir /data/yuzun/SR/data/SE_0921_ori/HR/test --output /data/yuzun/SR/results/focal_freq_loss1 --decoder_path /data/yuzun/SR/experience/focal_freq_loss1/decoder_iter_300000.pth --Trans_path /data/yuzun/SR/experience/focal_freq_loss1/transformer_iter_300000.pth --embedding_path /data/yuzun/SR/experience/focal_freq_loss1/embedding_iter_300000.pth --hidden_dim 512
+
+# 24-1-24 test freq_loss2 6003 在train上训练的
+#CUDA_VISIBLE_DEVICES=1  python test.py --style /data/yuzun/SR/data/SE_0921_ori/MR/test/SE_0921_3_111m.png --content_dir /data/yuzun/SR/data/SE_0921_ori/HR/test --output /data/yuzun/SR/results/freq_loss2 --decoder_path /data/yuzun/SR/experience/freq_loss2/decoder_iter_300000.pth --Trans_path /data/yuzun/SR/experience/freq_loss2/transformer_iter_300000.pth --embedding_path /data/yuzun/SR/experience/freq_loss2/embedding_iter_300000.pth --hidden_dim 512
+
+# 24-1-26 test freq_loss2 6003 在train上训练的 按照对应的目标图片
+CUDA_VISIBLE_DEVICES=0  python test.py --style_dir /data/yuzun/SR/data/SE_0921_ori/MR/test --content_dir /data/yuzun/SR/data/SE_0921_ori/HR/test --output /data/yuzun/SR/results_accod/freq_loss2 --decoder_path /data/yuzun/SR/experience/freq_loss2/decoder_iter_300000.pth --Trans_path /data/yuzun/SR/experience/freq_loss2/transformer_iter_300000.pth --embedding_path /data/yuzun/SR/experience/freq_loss2/embedding_iter_300000.pth --hidden_dim 512

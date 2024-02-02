@@ -80,7 +80,7 @@ args = parser.parse_args()
 content_size=512
 style_size=512
 crop='store_true'
-save_ext='.jpg'
+save_ext='.png'
 output_path=args.output
 preserve_color='store_true'
 alpha=args.a
@@ -88,8 +88,8 @@ alpha=args.a
 
 
 
-# device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-device = torch.device("cpu")
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+# device = torch.device("cpu")
 
 # Either --content or --content_dir should be given.
 if args.content:
@@ -154,35 +154,68 @@ network.to(device)
 content_tf = test_transform(content_size, crop)
 style_tf = test_transform(style_size, crop)
 
+# for content_path in content_paths:
+#     for style_path in style_paths:
+#         #print(content_path)
+#
+#
+#         content_tf1 = content_transform()
+#         content = content_tf(Image.open(content_path).convert("RGB"))
+#
+#         h,w,c=np.shape(content)
+#         style_tf1 = style_transform(h,w)
+#         style = style_tf(Image.open(style_path).convert("RGB"))
+#
+#
+#         style = style.to(device).unsqueeze(0)
+#         content = content.to(device).unsqueeze(0)
+#
+#         # test的时候开启
+#         with torch.no_grad():
+#             output= network(content,style)
+#         #output, loss_c, loss_s, loss_lambda1, loss_lambda2 = network(content,style)
+#             output = output.cpu()
+#
+#         output_name = '{:s}/{:s}_stylized_{:s}{:s}'.format(
+#             output_path, splitext(basename(content_path))[0],
+#             splitext(basename(style_path))[0], save_ext
+#         )
+#
+#         print(output_name)
+#
+#         save_image(output, output_name)
+
+# 根据content图片名字找style,取消style_suffix
 for content_path in content_paths:
-    for style_path in style_paths:
-        #print(content_path)
+
+    content_tf1 = content_transform()
+    content = content_tf(Image.open(content_path).convert("RGB"))
+
+    h,w,c=np.shape(content)
+    style_tf1 = style_transform(h,w)
+    content_image_name, ext = splitext(basename(content_path))
+    style_path = os.path.join(args.style_dir, content_image_name+'m'+ext)
+    # print("content:", content_path, "style:", style_path)
+    style = style_tf(Image.open(style_path).convert("RGB"))
 
 
-        content_tf1 = content_transform()
-        content = content_tf(Image.open(content_path).convert("RGB"))
+    style = style.to(device).unsqueeze(0)
+    content = content.to(device).unsqueeze(0)
 
-        h,w,c=np.shape(content)
-        style_tf1 = style_transform(h,w)
-        style = style_tf(Image.open(style_path).convert("RGB"))
+    # test的时候开启
+    with torch.no_grad():
+        output= network(content,style)
+    #output, loss_c, loss_s, loss_lambda1, loss_lambda2 = network(content,style)
+        # output = output.cpu()
 
+    print_name = '{:s}/{:s}_stylized_{:s}{:s}'.format(
+        output_path, splitext(basename(content_path))[0],
+        splitext(basename(style_path))[0], save_ext
+    )
 
-        style = style.to(device).unsqueeze(0)
-        content = content.to(device).unsqueeze(0)
+    output_name = os.path.join(output_path, content_image_name+save_ext)
+    print(print_name)
 
-        # test的时候开启
-        with torch.no_grad():
-            output= network(content,style)
-        #output, loss_c, loss_s, loss_lambda1, loss_lambda2 = network(content,style)
-            output = output.cpu()
-
-        output_name = '{:s}/{:s}_stylized_{:s}{:s}'.format(
-            output_path, splitext(basename(content_path))[0],
-            splitext(basename(style_path))[0], save_ext
-        )
-
-        print(output_name)
-
-        save_image(output, output_name)
+    save_image(output, output_name)
    
 
